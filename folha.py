@@ -25,7 +25,7 @@ def get_folha():
         titulo = folha.find('h2', {'class':"c-main-headline__title"})
         descricao = folha.find('p', {'class':"c-main-headline__standfirst"})
         link = folha.find('a', {'class':"c-main-headline__url"})
-        data = folha.find('time', {'class': "c-headline__dateline"})['datetime']
+        data_element = folha.find('time', {'class': "c-headline__dateline"})
 
 
         if titulo and descricao and link and data:
@@ -33,7 +33,8 @@ def get_folha():
             descricao_text = descricao.text.strip()
             descricao_text = codecs.encode(descricao_text, 'latin-1').decode('utf-8', 'ignore')  
             link_href = link['href']
-            data_text = data.text.strip()
+            data_text = data_element.text.strip()
+
 
             yield {
                 'title': titulo_text,
