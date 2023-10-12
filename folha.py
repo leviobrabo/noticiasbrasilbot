@@ -16,6 +16,7 @@ def get_folha():
     url = 'https://www1.folha.uol.com.br/ultimas-noticias/'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
     response = requests.get(url, headers=headers)
+    response.encoding = 'utf-8'
     html = bs(response.text, 'html.parser')
 
     folhas = html.find_all('div', {'class':"page"})
@@ -29,8 +30,8 @@ def get_folha():
 
         if titulo and descricao and link and data:
             titulo_text = titulo.text.strip()
-            titulo_text = codecs.encode(titulo_text, 'latin-1').decode('utf-8', 'ignore')  
             descricao_text = descricao.text.strip()
+            descricao_text = codecs.encode(descricao_text, 'latin-1').decode('utf-8', 'ignore')  
             link_href = link['href']
             data_text = data['datetime']
 
