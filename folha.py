@@ -35,7 +35,11 @@ def get_folha():
             link_href = link['href']
             data_text = data['datetime']
 
-            data_datetime = datetime.strptime(data_text, "%Y-%m-%d %H:%M")
+            data_text = data.text.strip()  # '12.out.2023 às 12h00'
+            data_text = data_text.replace(' às', '')  # Remover ' às'
+            
+            # Converter a data para o formato '12.out.2023 às 12h00'
+            data_datetime = datetime.strptime(data_text, "%d.%b.%Y %Hh%M")
             data_formatada = data_datetime.strftime("%d.%b.%Y às %Hh%M")
 
             yield {
