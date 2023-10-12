@@ -28,7 +28,7 @@ def get_folha():
         data_element = folha.find('time', {'class': "c-headline__dateline"})
 
 
-        if titulo and descricao and link and data:
+        if titulo and descricao and link and data_element:
             titulo_text = titulo.text.strip()
             descricao_text = descricao.text.strip()
             descricao_text = codecs.encode(descricao_text, 'latin-1').decode('utf-8', 'ignore')  
