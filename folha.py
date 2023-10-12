@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup as bs
 import telebot
 import sqlite3
+import codecs
+from datetime import datetime
 
 
 import time
@@ -27,15 +29,19 @@ def get_folha():
 
         if titulo and descricao and link and data:
             titulo_text = titulo.text.strip()
+            titulo_text = codecs.encode(titulo_text, 'latin-1').decode('utf-8', 'ignore')  
             descricao_text = descricao.text.strip()
             link_href = link['href']
-            data_text = data.text.strip()
+            data_text = data['datetime']
+
+            data_datetime = datetime.strptime(data_text, "%Y-%m-%d %H:%M")
+            data_formatada = data_datetime.strftime("%d.%b.%Y às %Hh%M")
 
             yield {
                 'title': titulo_text,
                 'description': descricao_text,
                 'link': link_href,
-                'date': data_text,
+                'date': data_formatada,
             }
             time.sleep(120)
 
