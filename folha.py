@@ -25,7 +25,7 @@ def get_folha():
         titulo = folha.find('h2', {'class':"c-main-headline__title"})
         descricao = folha.find('p', {'class':"c-main-headline__standfirst"})
         link = folha.find('a', {'class':"c-main-headline__url"})
-        data = folha.find('time', {'class':"c-headline__dateline"})
+        data = folha.find('time', {'class': "c-headline__dateline"})['datetime']
 
 
         if titulo and descricao and link and data:
@@ -33,20 +33,13 @@ def get_folha():
             descricao_text = descricao.text.strip()
             descricao_text = codecs.encode(descricao_text, 'latin-1').decode('utf-8', 'ignore')  
             link_href = link['href']
-            data_text = data['datetime']
-
-            data_text = data.text.strip()  # '12.out.2023 às 12h00'
-            data_text = data_text.replace(' às', '')  # Remover ' às'
-            
-            # Converter a data para o formato '12.out.2023 às 12h00'
-            data_datetime = datetime.strptime(data_text, "%d.%b.%Y %Hh%M")
-            data_formatada = data_datetime.strftime("%d.%b.%Y às %Hh%M")
+            data_text = data.text.strip()
 
             yield {
                 'title': titulo_text,
                 'description': descricao_text,
                 'link': link_href,
-                'date': data_formatada,
+                'date': data_text,
             }
             time.sleep(120)
 
