@@ -12,7 +12,7 @@ bot = telebot.TeleBot('6158090839:AAHT3YOgKMMXobnBMZiVJeVV855KmOeXctw', parse_mo
 def get_eco():
     url = 'https://veja.abril.com.br/economia/?utm_source=google&utm_medium=cpc&utm_campaign=eda_veja_audiencia_mercado&gad=1&gclid=Cj0KCQjwj5mpBhDJARIsAOVjBdooITTzhNRUD_iQog9BulvCWvAqirQJqCWWEXXwfyLtqqMFl1AIxDsaAoPZEALw_wcB'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, timeout=10, headers=headers)
     html = bs(response.text, 'html.parser')
 
     ecos = html.find_all('div', {'id':"infinite-list"})
