@@ -13,7 +13,7 @@ bot = telebot.TeleBot('6158090839:AAHT3YOgKMMXobnBMZiVJeVV855KmOeXctw', parse_mo
 def get_news():
     url = 'https://g1.globo.com/ultimas-noticias/'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, timeout=10, headers=headers)
     html = bs(response.text, 'html.parser')
 
     noticias = html.find_all('div', {'class': 'feed-post'})
