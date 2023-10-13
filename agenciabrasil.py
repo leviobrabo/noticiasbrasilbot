@@ -36,7 +36,7 @@ def get_ab():
                 'link': link_href,
                 'date': data_text,
             }
-            time.sleep(120)
+            time.sleep(300)
 
 def send_ab_to_channel():
     conn = sqlite3.connect('ab.db')
