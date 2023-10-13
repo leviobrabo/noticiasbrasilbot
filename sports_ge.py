@@ -12,7 +12,7 @@ bot = telebot.TeleBot('6158090839:AAHT3YOgKMMXobnBMZiVJeVV855KmOeXctw', parse_mo
 def get_sports():
     url = 'https://ge.globo.com/plantao/'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, timeout=10, headers=headers)
     html = bs(response.text, 'html.parser')
 
     esportes = html.find_all('div', class_="feed-root")
