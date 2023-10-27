@@ -10,6 +10,8 @@ import schedule
 
 import time
 from db import create_news_table, create_sports_table, create_eco_table, create_politica_table, create_folha_table, create_ab_table
+import sys
+print(sys.path)
 
 bot = telebot.TeleBot('6158090839:AAHT3YOgKMMXobnBMZiVJeVV855KmOeXctw', parse_mode="HTML")
 
