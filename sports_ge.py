@@ -35,7 +35,8 @@ def get_sports():
                 'link': link_href,
                 'date': data_text
             }
-            time.sleep(120)
+            time.sleep(3600)
+
 
 def send_sports_to_channel():
     conn = sqlite3.connect('sports.db')

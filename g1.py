@@ -39,7 +39,8 @@ def get_news():
                 'date': data_text,
                 'onde': onde_text
             }
-            time.sleep(120)
+            time.sleep(3600)
+
 
 def send_news_to_channel():
     conn = sqlite3.connect('news.db')

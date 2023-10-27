@@ -35,7 +35,8 @@ def get_eco():
                 'date': data_text,
                 'autor': autor_text
             }
-            time.sleep(1800)
+            time.sleep(7200)
+
 
 def send_eco_to_channel():
     conn = sqlite3.connect('eco.db')

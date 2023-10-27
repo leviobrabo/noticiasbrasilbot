@@ -36,7 +36,8 @@ def get_politica():
                 'date': data_text,
                 'autor': autor_text
             }
-            time.sleep(120)
+            time.sleep(3600)
+
 
 def send_politica_to_channel():
     conn = sqlite3.connect('politica.db')

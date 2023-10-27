@@ -42,7 +42,8 @@ def get_folha():
                 'link': link_href,
                 'date': data_text,
             }
-            time.sleep(120)
+            time.sleep(3600)
+
 
 def send_folha_to_channel():
     conn = sqlite3.connect('folha.db')
