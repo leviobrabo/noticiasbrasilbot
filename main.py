@@ -131,6 +131,7 @@ def get_news():
     noticias = html.find_all('div', {'class': 'feed-post'})
 
     for noticia in noticias:
+        imagem = noticia.find('div', {'class': 'bstn-fd-picture-image})
         titulo = noticia.find('a', {'class': 'feed-post-link gui-color-primary gui-color-hover'})
         descricao = noticia.find('div', {'class': 'feed-post-body-resumo'})
         link = noticia.find('a', {'class': 'feed-post-figure-link gui-image-hover'})
