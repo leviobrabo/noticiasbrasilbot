@@ -24,6 +24,7 @@ def get_ab():
     abs = html.find_all('div', {'class':"col-md-12 order-first view-content"})
 
     for ab in abs:
+        image = ab.find('div', class_='shadow overflow-hidden rounded-lg d-block w-100').find('img')
         titulo = ab.find('h4', {'clas':"alt-font font-weight-bold my-2"})
         descricao = ab.find('div', {'class':"alt-font text-secondary my-2"})
         link = ab.find('a', {'class':"post-item-desc py-0"})
