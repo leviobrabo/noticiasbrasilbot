@@ -242,7 +242,8 @@ def get_news():
                 f'Erro ao obter notícias. Status Code: {response.status_code}'
             )
             return []
-
+            
+        sleep(2000)
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
@@ -319,10 +320,11 @@ def upload_telegraph_image(image_url, attempt=0):
     logger.info('Fazendo upload da imagem no Telegraph...')
     if attempt == 3:
         return None
-
+    
     telegraph_api = telegraph.Telegraph(TELEGRAPH)
 
     try:
+        sleep(2000)
         file = requests.get(image_url)
         if file.status_code != 200:
             logger.warning(f'Erro ao baixar imagem do link: {image_url}')
@@ -344,6 +346,7 @@ def create_telegraph_post(
 ):
     logger.info('Criando post no Telegraph...')
     try:
+        sleep(2000)
         telegraph_api = telegraph.Telegraph(TELEGRAPH)
         response = telegraph_api.create_page(
             f'{title}',
@@ -366,7 +369,7 @@ def create_telegraph_posts():
     logger.info('Criando posts no Telegraph...')
     news = get_news()
     telegraph_links = []
-
+    
     for n in news:
         title = n['title']
         description = n['description']
@@ -433,7 +436,7 @@ if __name__ == '__main__':
                 f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
                 f'🗞 <a href="{original_link}">G1 NEWS</a>',
             )
-            sleep(120)
+            sleep(3000)
         logger.info('Todas as notícias foram enviadas para o Telegram.')
         sleep(1800)
         schedule.run_pending()
