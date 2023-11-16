@@ -72,7 +72,6 @@ def cmd_sys(message: types.Message):
         )
 
 
-
 # add_sudo
 
 
@@ -231,18 +230,19 @@ def cmd_start(message):
         logger.error(e)
 
 
-
 def get_news():
     logger.info('Obtendo notícias...')
     url = 'https://g1.globo.com/ultimas-noticias/'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                      '(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        '(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     try:
         response = requests.get(url, timeout=10, headers=headers)
         if response.status_code != 200:
-            logger.error(f'Erro ao obter notícias. Status Code: {response.status_code}')
+            logger.error(
+                f'Erro ao obter notícias. Status Code: {response.status_code}'
+            )
             return []
 
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -253,27 +253,42 @@ def get_news():
             logger.info('Notícia recebida')
 
             title_element = section.find('a', {'class': 'feed-post-link'})
-            description_element = section.find('div', {'class': 'feed-post-body-resumo'})
+            description_element = section.find(
+                'div', {'class': 'feed-post-body-resumo'}
+            )
             link_element = section.find('a', {'class': 'feed-post-link'})
-            image_element = section.find('img', {'class': 'bstn-fd-picture-image'})
-            
+            image_element = section.find(
+                'img', {'class': 'bstn-fd-picture-image'}
+            )
+
             if link_element:
-                 link_response = requests.get(link_element['href'], timeout=10, headers=headers)
+                link_response = requests.get(
+                    link_element['href'], timeout=10, headers=headers
+                )
             else:
-                print("Link não encontrado")
-                continue 
+                print('Link não encontrado')
+                continue
             link_content = BeautifulSoup(link_response.content, 'html.parser')
-        
-            full_text_content = link_content.find_all('div', {'class': 'mc-column content-text active-extra-styles'})
-            autor_element = link_content.find('p', {'class': 'content-publication-data__from'})
-            
-            if title_element and link_element and description_element and image_element:
+
+            full_text_content = link_content.find_all(
+                'div', {'class': 'mc-column content-text active-extra-styles'}
+            )
+            autor_element = link_content.find(
+                'p', {'class': 'content-publication-data__from'}
+            )
+
+            if (
+                title_element
+                and link_element
+                and description_element
+                and image_element
+            ):
                 title = title_element.text.strip()
                 link = link_element['href']
                 description = description_element.text.strip()
                 image_url = image_element['src']
 
-                full_text_text = ""
+                full_text_text = ''
                 for text_section in full_text_content:
                     text = text_section.get_text(separator='\n\n', strip=True)
                     if text:
@@ -284,14 +299,16 @@ def get_news():
                 else:
                     autor = None
 
-                news_list.append({
-                    'title': title,
-                    'description': description,
-                    'link': link,
-                    'image': image_url,
-                    'autor': autor,
-                    'full_text': full_text_text,
-                })
+                news_list.append(
+                    {
+                        'title': title,
+                        'description': description,
+                        'link': link,
+                        'image': image_url,
+                        'autor': autor,
+                        'full_text': full_text_text,
+                    }
+                )
 
         logger.info(f'{len(news_list)} notícias obtidas.')
         return news_list
@@ -299,7 +316,6 @@ def get_news():
     except Exception as e:
         logger.exception(f'Erro ao obter notícias: {str(e)}')
         return []
-
 
 
 def upload_telegraph_image(image_url, attempt=0):
@@ -314,31 +330,35 @@ def upload_telegraph_image(image_url, attempt=0):
         if file.status_code != 200:
             logger.warning(f'Erro ao baixar imagem do link: {image_url}')
             return None
-        
+
         inmemoryfile = io.BytesIO(file.content)
         path = telegraph_api.upload_file(inmemoryfile)
         return f'https://telegra.ph{path[0]["src"]}' if path else None
 
     except Exception as e:
-        logger.exception(f'Erro ao fazer upload da imagem no Telegraph: {str(e)}')
+        logger.exception(
+            f'Erro ao fazer upload da imagem no Telegraph: {str(e)}'
+        )
         return None
 
 
-def create_telegraph_post(title, description, link, image_url, autor, full_text):
+def create_telegraph_post(
+    title, description, link, image_url, autor, full_text
+):
     logger.info('Criando post no Telegraph...')
     try:
         telegraph_api = telegraph.Telegraph(TELEGRAPH)
         response = telegraph_api.create_page(
             f'{title}',
             html_content=(
-                f'<img src="{image_url}"><br><br>' +
-                f'<h4>{description}</h4><br><br>' +
-                f'{full_text}<br><br>' +
-                f'<a href="{link}">Leia a matéria original</a>'
+                f'<img src="{image_url}"><br><br>'
+                + f'<h4>{description}</h4><br><br>'
+                + f'{full_text}<br><br>'
+                + f'<a href="{link}">Leia a matéria original</a>'
             ),
-            author_name=f'{autor}'
+            author_name=f'{autor}',
         )
-        return response["url"], title, link
+        return response['url'], title, link
 
     except Exception as e:
         logger.exception(f'Erro ao criar post no Telegraph: {str(e)}')
@@ -358,30 +378,41 @@ def create_telegraph_posts():
         autor = n['autor']
         full_text = n['full_text']
 
-        telegraph_link = create_telegraph_post(title, description, link, image_url, autor, full_text)
-        if telegraph_link[0]:  
+        telegraph_link = create_telegraph_post(
+            title, description, link, image_url, autor, full_text
+        )
+        if telegraph_link[0]:
             telegraph_links.append(telegraph_link)
 
     logger.info(f'{len(telegraph_links)} posts criados no Telegraph.')
     return telegraph_links
 
+
 def total_news():
     try:
         all_news = db.get_all_news()
         total_count = len(list(all_news))  # Calculate total count
-        bot.send_message(GROUP_LOG, f'TOTAL de Notícia enviada hoje: <code>{total_count}</code> Notícias')  # Send the total count
+        bot.send_message(
+            GROUP_LOG,
+            f'TOTAL de Notícia enviada hoje: <code>{total_count}</code> Notícias',
+        )  # Send the total count
     except Exception as e:
         logger.exception(f'Error sending total news count: {str(e)}')
+
 
 def delete_news():
     try:
         logger.info('Deletando todas as noticias do bnaco de dados...')
         db.remove_all_news()
     except Exception as e:
-        logger.exception(f'Erro ao deletar as notícias do banco de dados: {str(e)}')
-schedule.every().day.at("00:00").do(delete_news)
+        logger.exception(
+            f'Erro ao deletar as notícias do banco de dados: {str(e)}'
+        )
 
-if __name__ == "__main__":
+
+schedule.every().day.at('00:00').do(delete_news)
+
+if __name__ == '__main__':
     while True:  # Loop infinito
         logger.info('Iniciando o bot...')
         created_links = create_telegraph_posts()
@@ -390,15 +421,21 @@ if __name__ == "__main__":
             if news_name:
                 logger.info('A notícia já foi postada.')
             else:
-                logger.info('Adicionando notícia ao banco de dados e enviando mensagem...')
-                current_datetime = datetime.now() - timedelta(hours=3)  
-                date = current_datetime.strftime("%d/%m/%Y - %H:%M:%S")
-                db.add_news(title, date)  # Adiciona a notícia ao banco de dados
+                logger.info(
+                    'Adicionando notícia ao banco de dados e enviando mensagem...'
+                )
+                current_datetime = datetime.now() - timedelta(hours=3)
+                date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
+                db.add_news(
+                    title, date
+                )  # Adiciona a notícia ao banco de dados
 
                 logger.info('Enviando notícia...')
-            bot.send_message(CHANNEL, 
-                            f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n' 
-                            f'🗞 <a href="{original_link}">G1 NEWS</a>')
+            bot.send_message(
+                CHANNEL,
+                f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
+                f'🗞 <a href="{original_link}">G1 NEWS</a>',
+            )
             sleep(120)
         logger.info('Todas as notícias foram enviadas para o Telegram.')
         sleep(1800)
