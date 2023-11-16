@@ -278,17 +278,19 @@ def get_news(limit=5):
             
             # Combinando o conteúdo de full_text_content e media_content em uma única variável
             full_text = ''
+            media_links = []
             for text_section in full_text_content:
                 text = text_section.get_text(strip=True)
                 if text:
                     full_text += text + '\n\n'
 
             for media_section in media_content:
-                media_text = media_section.get_text(strip=True)
-                if media_text:
-                    full_text += media_text + '\n\n'
-
-            
+                media_element = media_section.find('img')  # Altere 'img' para a tag de mídia utilizada
+                if media_element and 'src' in media_element.attrs:
+                    media_links.append(media_element['src'])  # Armazena o link de mídia
+                    # Adiciona a tag de mídia diretamente ao 'full_text'
+                    full_text += f'<img src="{media_element["src"]}">\n\n''src'
+                                    
             autor_element = link_content.find(
                 'p', {'class': 'content-publication-data__from'}
             )
