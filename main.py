@@ -243,7 +243,6 @@ def get_news():
             )
             return []
             
-        sleep(600)
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
@@ -314,6 +313,7 @@ def get_news():
     except Exception as e:
         logger.exception(f'Erro ao obter notícias: {str(e)}')
         return []
+schedule.every(10).minutes.do(get_news)
 
 
 def upload_telegraph_image(image_url, attempt=0):
@@ -397,6 +397,7 @@ def total_news():
     except Exception as e:
         logger.exception(f'Error sending total news count: {str(e)}')
 
+schedule.every().day.at('23:58').do(total_news)
 
 def delete_news():
     try:
