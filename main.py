@@ -279,14 +279,15 @@ def get_news(limit=5):
             # Combinando o conteúdo de full_text_content e media_content em uma única variável
             full_text = ''
             for text_section in full_text_content:
-                text = text_section.get_text(separator='\n\n', strip=True)
+                text = text_section.get_text(strip=True)
                 if text:
                     full_text += text + '\n\n'
 
             for media_section in media_content:
-                media_text = media_section.get_text(separator='\n\n', strip=True)
+                media_text = media_section.get_text(strip=True)
                 if media_text:
                     full_text += media_text + '\n\n'
+
             
             autor_element = link_content.find(
                 'p', {'class': 'content-publication-data__from'}
