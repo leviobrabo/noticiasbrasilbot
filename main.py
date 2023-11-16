@@ -271,44 +271,43 @@ def get_news(limit=5):
 
             article_body = link_content.find('div', {'class': 'articleBody'})
             if article_body:
-                 media_text_content = article_body.find_all('div', {'class': ['mc-column content-media', 'mc-column content-text']})
-            autor_element = link_content.find(
-                'p', {'class': 'content-publication-data__from'}
-            )
+                media_text_content = article_body.find_all('div', {'class': ['mc-column content-media', 'mc-column content-text']})
+                autor_element = link_content.find('p', {'class': 'content-publication-data__from'})
 
-            if (
-                title_element
-                and link_element
-                and description_element
-                and image_element
-            ):
-                title = title_element.text.strip()
-                link = link_element['href']
-                description = description_element.text.strip()
-                image_url = image_element['src']
+                if media_text_content:  # Verifica se há conteúdo correspondente
+                    if (
+                        title_element
+                        and link_element
+                        and description_element
+                        and image_element
+                    ):
+                        title = title_element.text.strip()
+                        link = link_element['href']
+                        description = description_element.text.strip()
+                        image_url = image_element['src']
 
-                full_text_text = ''
-                for text_section in media_text_content:
-                     text = text_section.get_text(separator='\n\n', strip=True)
-                if text:
-                    full_text_text += text + '\n\n'
-                if autor_element:
-                    autor = autor_element.text
-                else:
-                    autor = None
-                
-                news_list.append(
-                    {
-                        'title': title,
-                        'description': description,
-                        'link': link,
-                        'image': image_url,
-                        'autor': autor,
-                        'full_text': full_text_text,
-                    }
-                )
-                if len(news_list) >= limit:
-                   break
+                        full_text_text = ''
+                        for text_section in media_text_content:
+                            text = text_section.get_text(separator='\n\n', strip=True)
+                            if text:
+                                full_text_text += text + '\n\n'
+                        if autor_element:
+                            autor = autor_element.text
+                        else:
+                            autor = None
+
+                        news_list.append(
+                            {
+                                'title': title,
+                                'description': description,
+                                'link': link,
+                                'image': image_url,
+                                'autor': autor,
+                                'full_text': full_text_text,
+                            }
+                        )
+                        if len(news_list) >= limit:
+                            break
 
         logger.info(f'{len(news_list)} notícias obtidas.')
         return news_list
