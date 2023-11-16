@@ -288,6 +288,10 @@ def get_news(limit=5):
                 if media_text:
                     full_text += media_text + '\n\n'
             
+            autor_element = link_content.find(
+                'p', {'class': 'content-publication-data__from'}
+            )
+
             if (
                 title_element
                 and link_element
