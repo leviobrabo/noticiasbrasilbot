@@ -296,8 +296,7 @@ def get_news(limit=5):
                     autor = autor_element.text
                 else:
                     autor = None
-                if len(news_list) >= limit:
-                   break
+                
                 news_list.append(
                     {
                         'title': title,
@@ -308,6 +307,8 @@ def get_news(limit=5):
                         'full_text': full_text_text,
                     }
                 )
+                if len(news_list) >= limit:
+                   break
 
         logger.info(f'{len(news_list)} notícias obtidas.')
         return news_list
