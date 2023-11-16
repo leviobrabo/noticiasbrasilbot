@@ -269,59 +269,53 @@ def get_news(limit=5):
                 continue
             link_content = BeautifulSoup(link_response.content, 'html.parser')
 
-            article_body = link_content.find('div', {'class': 'articleBody'})
-            if article_body:
-                media_text_content = article_body.find_all('div', {'class': [
-                    'mc-column', 'content-text', 'active-extra-styles', 'active-capital-letter'
-                ]})
+            full_text_content = link_content.find_all(
+                'div', {'class': 'mc-column content-text active-extra-styles'}
+            )
+            media_content = link_content.find_all(
+                'div', {'class': 'mc-column content-media__container'}
+            )
+            
+            # Combinando o conteúdo de full_text_content e media_content em uma única variável
+            full_text = ''
+            for text_section in full_text_content:
+                text = text_section.get_text(separator='\n\n', strip=True)
+                if text:
+                    full_text += text + '\n\n'
 
-                content_media_container = article_body.find_all('div', {'class': [
-                    'content-media-container', 'glb-skeleton-box'
-                ]})
-                autor_element = link_content.find('p', {'class': 'content-publication-data__from'})
+            for media_section in media_content:
+                media_text = media_section.get_text(separator='\n\n', strip=True)
+                if media_text:
+                    full_text += media_text + '\n\n'
+            
+            if (
+                title_element
+                and link_element
+                and description_element
+                and image_element
+            ):
+                title = title_element.text.strip()
+                link = link_element['href']
+                description = description_element.text.strip()
+                image_url = image_element['src']
 
-                if media_text_content:  # Verifica se há conteúdo correspondente
-                    if (
-                        title_element
-                        and link_element
-                        and description_element
-                        and image_element
-                    ):
-                        title = title_element.text.strip()
-                        link = link_element['href']
-                        description = description_element.text.strip()
-                        image_url = image_element['src']
-
-                        full_text_text = ''
-
-                        # Coletando texto dos elementos 'mc-column content-text'
-                        for text_section in media_text_content:
-                            text = text_section.get_text(separator='\n\n', strip=True)
-                            if text:
-                                full_text_text += text + '\n\n'
-
-                        # Coletando texto dos elementos 'content-media-container'
-                        for media_section in content_media_container:
-                            media_text = media_section.get_text(separator='\n\n', strip=True)
-                            if media_text:
-                                full_text_text += media_text + '\n\n'
-                        if autor_element:
-                            autor = autor_element.text
-                        else:
-                            autor = None
-
-                        news_list.append(
-                            {
-                                'title': title,
-                                'description': description,
-                                'link': link,
-                                'image': image_url,
-                                'autor': autor,
-                                'full_text': full_text_text,
-                            }
-                        )
-                        if len(news_list) >= limit:
-                            break
+                if autor_element:
+                    autor = autor_element.text
+                else:
+                    autor = None
+                
+                news_list.append(
+                    {
+                        'title': title,
+                        'description': description,
+                        'link': link,
+                        'image': image_url,
+                        'autor': autor,
+                        'full_text': full_text,  # Salvando o conteúdo combinado em 'full_text'
+                    }
+                )
+                if len(news_list) >= limit:
+                   break
 
         logger.info(f'{len(news_list)} notícias obtidas.')
         return news_list
@@ -329,6 +323,7 @@ def get_news(limit=5):
     except Exception as e:
         logger.exception(f'Erro ao obter notícias: {str(e)}')
         return []
+
 
 
 def upload_telegraph_image(image_url, attempt=0):
