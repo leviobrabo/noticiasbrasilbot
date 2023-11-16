@@ -228,7 +228,7 @@ def cmd_start(message):
         logger.error(e)
 
 
-def get_news():
+def get_news(limit=4):
     logger.info('Obtendo notícias...')
     url = 'https://g1.globo.com/ultimas-noticias/'
     headers = {
@@ -246,7 +246,7 @@ def get_news():
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
-        news_list = []
+        news_list = news_list[:limit]
         for section in post_sections:
             logger.info('Notícia recebida')
 
@@ -313,7 +313,6 @@ def get_news():
     except Exception as e:
         logger.exception(f'Erro ao obter notícias: {str(e)}')
         return []
-schedule.every(10).minutes.do(get_news)
 
 
 def upload_telegraph_image(image_url, attempt=0):
@@ -436,11 +435,11 @@ if __name__ == '__main__':
                         f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
                         f'🗞 <a href="{original_link}">G1 NEWS</a>',
                     )
-                    sleep(60)
+                    sleep(900)
                     
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
-            sleep(1800)
+            sleep(3600)
             schedule.run_pending()
             sleep(60)
             
