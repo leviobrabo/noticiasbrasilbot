@@ -360,12 +360,17 @@ def create_telegraph_post(
     logger.info('Criando post no Telegraph...')
     try:
         telegraph_api = telegraph.Telegraph(TELEGRAPH)
+        
+        # Formatação do conteúdo 'full_text'
+        paragraphs = [f'<p>{paragraph}</p>' for paragraph in full_text.split('\n\n')]
+        formatted_text = ''.join(paragraphs)
+        
         response = telegraph_api.create_page(
             f'{title}',
             html_content=(
                 f'<img src="{image_url}"><br><br>'
                 + f'<h4>{description}</h4><br><br>'
-                + f'{full_text}<br><br>'
+                + f'{formatted_text}<br><br>'
                 + f'<a href="{link}">Leia a matéria original</a>'
             ),
             author_name=f'{autor}',
@@ -375,6 +380,7 @@ def create_telegraph_post(
     except Exception as e:
         logger.exception(f'Erro ao criar post no Telegraph: {str(e)}')
         return None, None, None
+
 
 
 def create_telegraph_posts():
