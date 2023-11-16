@@ -4,13 +4,11 @@ from bs4 import BeautifulSoup
 import configparser
 from telebot.apihelper import ApiTelegramException
 import psutil
-import threading
 
 import telebot
 from telebot import types
 import telegraph
 
-import codecs
 from datetime import datetime, timedelta
 from time import sleep
 
