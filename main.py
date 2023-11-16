@@ -271,7 +271,13 @@ def get_news(limit=5):
 
             article_body = link_content.find('div', {'class': 'articleBody'})
             if article_body:
-                media_text_content = article_body.find_all('div', {'class': ['mc-column content-media', 'mc-column content-text']})
+                media_text_content = article_body.find_all('div', {'class': [
+                    'mc-column', 'content-text', 'active-extra-styles', 'active-capital-letter'
+                ]})
+
+                content_media_container = article_body.find_all('div', {'class': [
+                    'content-media-container', 'glb-skeleton-box'
+                ]})
                 autor_element = link_content.find('p', {'class': 'content-publication-data__from'})
 
                 if media_text_content:  # Verifica se há conteúdo correspondente
@@ -287,10 +293,18 @@ def get_news(limit=5):
                         image_url = image_element['src']
 
                         full_text_text = ''
+
+                        # Coletando texto dos elementos 'mc-column content-text'
                         for text_section in media_text_content:
                             text = text_section.get_text(separator='\n\n', strip=True)
                             if text:
                                 full_text_text += text + '\n\n'
+
+                        # Coletando texto dos elementos 'content-media-container'
+                        for media_section in content_media_container:
+                            media_text = media_section.get_text(separator='\n\n', strip=True)
+                            if media_text:
+                                full_text_text += media_text + '\n\n'
                         if autor_element:
                             autor = autor_element.text
                         else:
