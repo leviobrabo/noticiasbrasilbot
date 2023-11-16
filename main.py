@@ -228,7 +228,7 @@ def cmd_start(message):
         logger.error(e)
 
 
-def get_news(limit=4):
+def get_news(limit=5):
     logger.info('Obtendo notícias...')
     url = 'https://g1.globo.com/ultimas-noticias/'
     headers = {
@@ -435,7 +435,7 @@ if __name__ == '__main__':
                         f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
                         f'🗞 <a href="{original_link}">G1 NEWS</a>',
                     )
-                    sleep(900)
+                    sleep(720)
                     
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
