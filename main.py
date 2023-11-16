@@ -269,9 +269,9 @@ def get_news(limit=5):
                 continue
             link_content = BeautifulSoup(link_response.content, 'html.parser')
 
-            full_text_content = link_content.find_all(
-                'div', {'class': 'mc-column content-text active-extra-styles'}
-            )
+            article_body = link_content.find('div', {'class': 'articleBody'})
+            if article_body:
+                 media_text_content = article_body.find_all('div', {'class': ['mc-column content-media', 'mc-column content-text']})
             autor_element = link_content.find(
                 'p', {'class': 'content-publication-data__from'}
             )
@@ -288,10 +288,10 @@ def get_news(limit=5):
                 image_url = image_element['src']
 
                 full_text_text = ''
-                for text_section in full_text_content:
-                    text = text_section.get_text(separator='\n\n', strip=True)
-                    if text:
-                        full_text_text += text + '\n\n'
+                for text_section in media_text_content:
+                     text = text_section.get_text(separator='\n\n', strip=True)
+                if text:
+                    full_text_text += text + '\n\n'
                 if autor_element:
                     autor = autor_element.text
                 else:
