@@ -243,7 +243,7 @@ def get_news():
             )
             return []
             
-        sleep(3000)
+        sleep(600)
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
@@ -435,6 +435,7 @@ if __name__ == '__main__':
                         f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
                         f'🗞 <a href="{original_link}">G1 NEWS</a>',
                     )
+                    
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
             sleep(1800)
