@@ -412,29 +412,34 @@ schedule.every().day.at('00:00').do(delete_news)
 
 if __name__ == '__main__':
     while True:  # Loop infinito
-        logger.info('Iniciando o bot...')
-        created_links = create_telegraph_posts()
-        for telegraph_link, title, original_link in created_links:
-            news_name = db.search_title(title)
-            if news_name:
-                logger.info('A notícia já foi postada.')
-            else:
-                logger.info(
-                    'Adicionando notícia ao banco de dados e enviando mensagem...'
-                )
-                current_datetime = datetime.now() - timedelta(hours=3)
-                date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
-                db.add_news(
-                    title, date
-                )  # Adiciona a notícia ao banco de dados
+        try:
+            logger.info('Iniciando o bot...')
+            created_links = create_telegraph_posts()
+            
+            for telegraph_link, title, original_link in created_links:
+                news_name = db.search_title(title)
+                
+                if news_name:
+                    logger.info('A notícia já foi postada.')
+                else:
+                    logger.info(
+                        'Adicionando notícia ao banco de dados e enviando mensagem...'
+                    )
+                    current_datetime = datetime.now() - timedelta(hours=3)
+                    date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
+                    db.add_news(title, date)  # Adiciona a notícia ao banco de dados
 
-                logger.info('Enviando notícia...')
-            bot.send_message(
-                CHANNEL,
-                f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
-                f'🗞 <a href="{original_link}">G1 NEWS</a>',
-            )
-        logger.info('Todas as notícias foram enviadas para o Telegram.')
-        sleep(1800)
-        schedule.run_pending()
-        sleep(60)
+                    logger.info('Enviando notícia...')
+                    bot.send_message(
+                        CHANNEL,
+                        f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
+                        f'🗞 <a href="{original_link}">G1 NEWS</a>',
+                    )
+
+            logger.info('Todas as notícias foram enviadas para o Telegram.')
+            sleep(1800)
+            schedule.run_pending()
+            sleep(60)
+            
+        except Exception as e:
+            logger.exception(f'Erro não tratado: {str(e)}')
