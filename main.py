@@ -235,7 +235,7 @@ def get_news(limit=5):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
         '(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    news_list = []
+    
     try:
         response = requests.get(url, timeout=10, headers=headers)
         if response.status_code != 200:
@@ -247,7 +247,7 @@ def get_news(limit=5):
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
-        news_list = news_list[:limit]
+        news_list = []
         for section in post_sections:
             logger.info('Notícia recebida')
 
@@ -296,7 +296,8 @@ def get_news(limit=5):
                     autor = autor_element.text
                 else:
                     autor = None
-
+                if len(news_list) >= limit:
+                   break
                 news_list.append(
                     {
                         'title': title,
