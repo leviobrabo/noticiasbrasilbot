@@ -291,7 +291,6 @@ def get_news():
                     text = text_section.get_text(separator='\n\n', strip=True)
                     if text:
                         full_text_text += text + '\n\n'
-                print(full_text_text)
                 if autor_element:
                     autor = autor_element.text
                 else:
