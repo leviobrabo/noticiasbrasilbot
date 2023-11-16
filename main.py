@@ -443,8 +443,10 @@ if __name__ == '__main__':
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
             sleep(3600)
+            logger.info('Reiniciando a pesquisa após 1h')
             schedule.run_pending()
             sleep(60)
+            logger.info('Observando se há schedule')
             
         except Exception as e:
             logger.exception(f'Erro não tratado: {str(e)}')
