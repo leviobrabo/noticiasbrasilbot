@@ -435,6 +435,7 @@ if __name__ == '__main__':
                         f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
                         f'🗞 <a href="{original_link}">G1 NEWS</a>',
                     )
+                    sleep(60)
                     
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
