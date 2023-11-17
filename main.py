@@ -373,7 +373,7 @@ def create_telegraph_post(
             html_content=(
                 f'<img src="{image_url}"><br><br>'
                 + f'<h4>{description}</h4><br><br>'
-                + f'{formatted_text}<br><br>'
+                + f'<p>{formatted_text}</p><br><br>'
                 + f'<a href="{link}">Leia a matéria original</a>'
             ),
             author_name=f'{autor}',
