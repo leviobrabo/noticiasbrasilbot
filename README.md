@@ -23,7 +23,11 @@ $ pip3 install requirements.txt
 
 # Variáveis ambientes
 
-# Altere sample.bot.conf para bot.config e defina as variavéis:
+# Altere sample.bot.conf para bot.conf:
+$ cp sample.bot.conf bot.conf
+
+# Defina as variavéis
+$ vi bot.conf
 
 # Execute a aplicação
 $ python3 main.py
