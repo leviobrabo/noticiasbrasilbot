@@ -1,4 +1,4 @@
-﻿# NotÍcias Brasil
+﻿# Notícias Brasil
 
 
 ## Envia notícias direto do site do [G1 News](https://g1.globo.com/ultimas-noticias/) para o canal do telegram [Notícias Brasil](https://t.me/noticiasbrasil24h).
