@@ -70,113 +70,6 @@ def cmd_sys(message: types.Message):
         )
 
 
-# add_sudo
-
-
-@bot.message_handler(commands=['add_sudo'])
-def add_sudo(message):
-    try:
-        if message.chat.type == 'private':
-            if message.from_user.id == OWNER:
-                if len(message.text.split()) == 2:
-                    user_id = message.from_user.id
-                    user = int(message.text.split()[1])
-                    user_db = db.search_user(user)
-
-                    if user_db:
-                        if user_db.get('sudo') == 'true':
-                            bot.send_message(
-                                message.chat.id,
-                                'Este usuário já tem permissão de sudo.',
-                            )
-                        else:
-                            result = db.set_user_sudo(user)
-                        if result.modified_count > 0:
-                            if message.from_user.username:
-                                username = '@' + message.from_user.username
-                            else:
-                                username = 'Não tem um nome de usuário'
-                            updated_user = db.search_user(user)
-                            if updated_user:
-                                bot.send_message(
-                                    message.chat.id,
-                                    f"<b>Novo sudo adicionado com sucesso</b>\n\n<b>ID:</b> <code>{user}</code>\n<b>Nome:</b> {updated_user.get('first_name')}\n<b>Username:</b> {username}",
-                                )
-                                bot.send_message(
-                                    GROUP_LOG,
-                                    f"<b>#{BOT_USERNAME} #New_sudo</b>\n<b>ID:</b> <code>{user}</code>\n<b>Name:</b> {updated_user.get('first_name')}\nU<b>sername:</b> {username}",
-                                )
-                        else:
-                            bot.send_message(
-                                message.chat.id,
-                                'User not found in the database.',
-                            )
-                    else:
-                        bot.send_message(
-                            message.chat.id, 'User not found in the database.'
-                        )
-                else:
-                    bot.send_message(
-                        message.chat.id,
-                        'Por favor, forneça um ID de usuário após /add_sudo.',
-                    )
-
-    except Exception as e:
-        logger.error(e)
-
-
-# rem_sudo
-@bot.message_handler(commands=['rem_sudo'])
-def unsudo_command(message):
-    try:
-        if message.chat.type == 'private':
-            if message.from_user.id == OWNER:
-                if len(message.text.split()) == 2:
-                    user_id = int(message.text.split()[1])
-                    user = db.search_user(user_id)
-                    if user:
-                        if user.get('sudo') == 'false':
-                            bot.send_message(
-                                message.chat.id,
-                                'Este usuário já não tem permissão de sudo.',
-                            )
-                        else:
-                            result = db.un_set_user_sudo(user_id)
-                            if result.modified_count > 0:
-                                if message.from_user.username:
-                                    username = '@' + message.from_user.username
-                                else:
-                                    username = 'Não tem um nome de usuário'
-                                updated_user = db.search_user(user_id)
-                                if updated_user:
-                                    bot.send_message(
-                                        message.chat.id,
-                                        f"<b>User sudo removido com sucesso</b>\n\n<b>ID:</b> <code>{user_id}</code>\n<b>Nome:</b> {updated_user.get('first_name')}\n<b>Username:</b> {username}",
-                                    )
-                                    bot.send_message(
-                                        GROUP_LOG,
-                                        f"<b>#{BOT_USERNAME} #Rem_sudo</b>\n<b>ID:</b> <code>{user_id}</code>\n<b>Nome:</b> {updated_user.get('first_name')}\n<b>Username:</b> {username}",
-                                    )
-                            else:
-                                bot.send_message(
-                                    message.chat.id,
-                                    'Usuário não encontrado no banco de dados.',
-                                )
-                    else:
-                        bot.send_message(
-                            message.chat.id,
-                            'Usuário não encontrado no banco de dados.',
-                        )
-                else:
-                    bot.send_message(
-                        message.chat.id,
-                        'Por favor, forneça um ID de usuário após /rem_sudo.',
-                    )
-
-    except Exception as e:
-        logger.error(e)
-
-
 # start
 
 
@@ -228,6 +121,8 @@ def cmd_start(message):
         logger.error(e)
 
 
+# Noticias
+
 def get_news(limit=5):
     logger.info('Obtendo notícias...')
     url = 'https://g1.globo.com/ultimas-noticias/'
@@ -235,7 +130,7 @@ def get_news(limit=5):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
         '(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
-    
+
     try:
         response = requests.get(url, timeout=10, headers=headers)
         if response.status_code != 200:
@@ -243,7 +138,7 @@ def get_news(limit=5):
                 f'Erro ao obter notícias. Status Code: {response.status_code}'
             )
             return []
-            
+
         soup = BeautifulSoup(response.content, 'html.parser')
         post_sections = soup.find_all('div', {'class': 'bastian-feed-item'})
 
@@ -275,8 +170,7 @@ def get_news(limit=5):
             media_content = link_content.find_all(
                 'div', {'class': 'mc-column content-media__container'}
             )
-            
-            # Combinando o conteúdo de full_text_content e media_content em uma única variável
+
             full_text = ''
             media_links = []
             for text_section in full_text_content:
@@ -285,12 +179,11 @@ def get_news(limit=5):
                     full_text += text + '\n\n'
 
             for media_section in media_content:
-                media_element = media_section.find('img')  # Altere 'img' para a tag de mídia utilizada
+                media_element = media_section.find('img')
                 if media_element and 'src' in media_element.attrs:
-                    media_links.append(media_element['src'])  # Armazena o link de mídia
-                    # Adiciona a tag de mídia diretamente ao 'full_text'
+                    media_links.append(media_element['src'])
                     full_text += f'<img src="{media_element["src"]}">\n\n''src'
-                                    
+
             autor_element = link_content.find(
                 'p', {'class': 'content-publication-data__from'}
             )
@@ -310,7 +203,7 @@ def get_news(limit=5):
                     autor = autor_element.text
                 else:
                     autor = None
-                
+
                 news_list.append(
                     {
                         'title': title,
@@ -318,11 +211,11 @@ def get_news(limit=5):
                         'link': link,
                         'image': image_url,
                         'autor': autor,
-                        'full_text': full_text,  # Salvando o conteúdo combinado em 'full_text'
+                        'full_text': full_text,
                     }
                 )
                 if len(news_list) >= limit:
-                   break
+                    break
 
         logger.info(f'{len(news_list)} notícias obtidas.')
         return news_list
@@ -332,12 +225,11 @@ def get_news(limit=5):
         return []
 
 
-
 def upload_telegraph_image(image_url, attempt=0):
     logger.info('Fazendo upload da imagem no Telegraph...')
     if attempt == 3:
         return None
-    
+
     telegraph_api = telegraph.Telegraph(TELEGRAPH)
 
     try:
@@ -363,34 +255,38 @@ def create_telegraph_post(
     logger.info('Criando post no Telegraph...')
     try:
         telegraph_api = telegraph.Telegraph(TELEGRAPH)
-        
-        # Formatação do conteúdo 'full_text'
-        paragraphs = [f'<p>{paragraph}</p>' for paragraph in full_text.split('\n\n')]
-        formatted_text = ''.join(paragraphs)
-        
+
+        formatted_text = ''.join(
+            [f'<p>{paragraph}</p>' for paragraph in full_text.split('\n\n')])
+        iv_template = """
+            <figure>
+                <img src="{}">
+                <figcaption>{}</figcaption>
+            </figure>
+            <h1>{}</h1>
+            <p>{}</p>
+            <a href="{}">Leia a matéria original</a>
+            <footer>{}</footer>
+        """.format(image_url, description, title, formatted_text, link, autor)
+
         response = telegraph_api.create_page(
             f'{title}',
-            html_content=(
-                f'<img src="{image_url}"><br><br>'
-                + f'<h4>{description}</h4><br><br>'
-                + f'<p>{formatted_text}</p><br><br>'
-                + f'<a href="{link}">Leia a matéria original</a>'
-            ),
+            html_content=iv_template,
             author_name=f'{autor}',
         )
         return response['url'], title, link
 
     except Exception as e:
+
         logger.exception(f'Erro ao criar post no Telegraph: {str(e)}')
         return None, None, None
-
 
 
 def create_telegraph_posts():
     logger.info('Criando posts no Telegraph...')
     news = get_news()
     telegraph_links = []
-    
+
     for n in news:
         title = n['title']
         description = n['description']
@@ -412,15 +308,17 @@ def create_telegraph_posts():
 def total_news():
     try:
         all_news = db.get_all_news()
-        total_count = len(list(all_news))  # Calculate total count
+        total_count = len(list(all_news))
         bot.send_message(
             GROUP_LOG,
             f'TOTAL de Notícia enviada hoje: <code>{total_count}</code> Notícias',
-        )  # Send the total count
+        )
     except Exception as e:
         logger.exception(f'Error sending total news count: {str(e)}')
 
+
 schedule.every().day.at('23:58').do(total_news)
+
 
 def delete_news():
     try:
@@ -435,14 +333,14 @@ def delete_news():
 schedule.every().day.at('00:00').do(delete_news)
 
 if __name__ == '__main__':
-    while True:  # Loop infinito
+    while True:
         try:
             logger.info('Iniciando o bot...')
             created_links = create_telegraph_posts()
-            
+
             for telegraph_link, title, original_link in created_links:
                 news_name = db.search_title(title)
-                
+
                 if news_name:
                     logger.info('A notícia já foi postada.')
                 else:
@@ -451,7 +349,7 @@ if __name__ == '__main__':
                     )
                     current_datetime = datetime.now() - timedelta(hours=3)
                     date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
-                    db.add_news(title, date)  # Adiciona a notícia ao banco de dados
+                    db.add_news(title, date)
 
                     logger.info('Enviando notícia...')
                     bot.send_message(
@@ -460,7 +358,6 @@ if __name__ == '__main__':
                         f'🗞 <a href="{original_link}">G1 NEWS</a>',
                     )
                     sleep(720)
-                    
 
             logger.info('Todas as notícias foram enviadas para o Telegram.')
             sleep(3600)
@@ -468,6 +365,6 @@ if __name__ == '__main__':
             schedule.run_pending()
             sleep(60)
             logger.info('Observando se há schedule')
-            
+
         except Exception as e:
             logger.exception(f'Erro não tratado: {str(e)}')
