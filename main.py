@@ -256,17 +256,18 @@ def create_telegraph_post(
     try:
         telegraph_api = telegraph.Telegraph(TELEGRAPH)
 
+        paragraphs = full_text.split('\n\n')
         formatted_text = ''.join(
-            [f'<p>{paragraph}</p>' for paragraph in full_text.split('\n\n')])
+            [f'<p>{paragraph}</p>' for paragraph in paragraphs])
 
-        iv_template = """
+        iv_template = f"""
             <figure>
-                <img src="{}">
-                <figcaption>{}</figcaption>
+                <img src="{image_url}">
+                <figcaption>{description}</figcaption>
             </figure>
-            <p>{}</p>
-            <a href="{}">Leia a matéria original</a>
-        """.format(image_url, description, formatted_text, link, autor)
+            {formatted_text}
+            <a href="{link}">Leia a matéria original</a>
+        """
 
         response = telegraph_api.create_page(
             f'{title}',
