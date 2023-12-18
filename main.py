@@ -265,7 +265,7 @@ def create_telegraph_post(
                 <img src="{image_url}">
                 <figcaption>{description}</figcaption>
             </figure>
-            {formatted_text}
+            <p>{formatted_text}</p>
             <a href="{link}">Leia a matéria original</a>
         """
 
