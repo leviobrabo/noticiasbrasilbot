@@ -258,7 +258,6 @@ def create_telegraph_post(
 
         formatted_text = ''.join(
             [f'<p>{paragraph}</p>' for paragraph in full_text.split('\n\n')])
-        formatted_title = f'<strong>{title}</strong>'
 
         iv_template = """
             <figure>
@@ -267,8 +266,8 @@ def create_telegraph_post(
             </figure>
             <p>{}</p>
             <a href="{}">Leia a matéria original</a>
-            <footer>{}</footer>
-        """.format(image_url, description, formatted_title, link, autor)
+            <div>{}</div>
+        """.format(image_url, description, formatted_text, link, autor)
 
         response = telegraph_api.create_page(
             f'{title}',
