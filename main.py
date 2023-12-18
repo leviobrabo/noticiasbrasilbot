@@ -266,7 +266,6 @@ def create_telegraph_post(
             </figure>
             <p>{}</p>
             <a href="{}">Leia a matéria original</a>
-            <div>{}</div>
         """.format(image_url, description, formatted_text, link, autor)
 
         response = telegraph_api.create_page(
