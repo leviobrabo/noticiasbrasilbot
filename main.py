@@ -86,7 +86,7 @@ def cmd_start(message):
             db.add_user_db(message)
             user = db.search_user(user_id)
             user_info = f"<b>#{BOT_USERNAME} #New_User</b>\n<b>User:</b> {user['first_name']}\n<b>ID:</b> <code>{user['user_id']}</code>\n<b>Username</b>: {user['username']}"
-            bot.send_message(GROUP_LOG, user_info)
+            bot.send_message(GROUP_LOG, user_info, message_thread_id=38589,)
             logger.info(
                 f'novo usuário ID: {user["user_id"]} foi criado no banco de dados'
             )
@@ -260,14 +260,14 @@ def create_telegraph_post(
         formatted_text = ''.join(
             [f'<p>{paragraph}</p>' for paragraph in paragraphs])
 
-        iv_template = f"""
+        iv_template = f""
             <figure>
                 <img src="{image_url}">
                 <figcaption>{description}</figcaption>
             </figure>
             <p>{formatted_text}</p>
             <a href="{link}">Leia a matéria original</a>
-        """
+        ""
 
         response = telegraph_api.create_page(
             f'{title}',
@@ -311,6 +311,7 @@ def total_news():
         bot.send_message(
             GROUP_LOG,
             f'TOTAL de Notícia enviada hoje: <code>{total_count}</code> Notícias',
+            message_thread_id=38589,
         )
     except Exception as e:
         logger.exception(f'Error sending total news count: {str(e)}')
