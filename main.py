@@ -260,14 +260,15 @@ def create_telegraph_post(
         formatted_text = ''.join(
             [f'<p>{paragraph}</p>' for paragraph in paragraphs])
 
-        iv_template = f""
+        iv_template = '''
             <figure>
-                <img src="{image_url}">
-                <figcaption>{description}</figcaption>
+                <img src="{}" alt="{}">
+                <figcaption>{}</figcaption>
             </figure>
-            <p>{formatted_text}</p>
-            <a href="{link}">Leia a matéria original</a>
-        ""
+            <p>{}</p>
+            <a href="{}" target="_blank" rel="noopener noreferrer">Leia a matéria original</a>
+            <p>Algum outro conteúdo aqui.</p>
+        '''.format(image_url, description, description, formatted_text, link)
 
         response = telegraph_api.create_page(
             f'{title}',
@@ -279,6 +280,8 @@ def create_telegraph_post(
     except Exception as e:
         logger.exception(f'Erro ao criar post no Telegraph: {str(e)}')
         return None, None, None
+
+
 
 
 def create_telegraph_posts():
