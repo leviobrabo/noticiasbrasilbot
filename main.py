@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 
 import configparser
-from telebot.apihelper import ApiTelegramException
 import psutil
 
 import telebot
@@ -34,19 +33,6 @@ TELEGRAPH = config['NEWS']['TELEGRAPH_TOKEN']
 
 bot = telebot.TeleBot(TOKEN, parse_mode='HTML')
 
-# Anti-spam
-
-for _ in range(4):
-    try:
-        bot.send_message
-    except ApiTelegramException as ex:
-        if ex.error_code == 429:
-            sleep(ex.result_json['parameters']['retry_after'])
-        else:
-            raise
-else:
-    bot.send_message
-
 # SUDO
 
 
@@ -66,8 +52,31 @@ def cmd_sys(message: types.Message):
     if sudo(user_id):
         bot.reply_to(
             message,
-            f'\n──❑ 「 System Stats 」 ❑──\n\n ☆ CPU usage: {psutil.cpu_percent(4)} %\n ☆ RAM usage: {psutil.virtual_memory()[2]} %',
+            f'\n──❑ 「 System Stats 」 ❑──\n\n'
+            f' ☆ CPU usage: {psutil.cpu_percent(4)} %\n'
+            f' ☆ RAM usage: {psutil.virtual_memory()[2]} %',
         )
+
+
+@bot.message_handler(commands=['stats'])
+def cmd_stats(message: types.Message):
+    user_id = message.from_user.id
+    if not sudo(user_id):
+        return
+    try:
+        total_news_count = len(list(db.get_all_news()))
+        total_users = len(list(db.get_all_users()))
+        total_chats = len(list(db.get_all_chats()))
+        bot.reply_to(
+            message,
+            f'📊 <b>Estatísticas do Bot</b>\n\n'
+            f'📰 Notícias postadas hoje: <code>{total_news_count}</code>\n'
+            f'👤 Total de usuários: <code>{total_users}</code>\n'
+            f'💬 Total de grupos: <code>{total_chats}</code>',
+        )
+    except Exception as e:
+        logger.exception(f'Erro ao obter estatísticas: {str(e)}')
+        bot.reply_to(message, 'Erro ao obter estatísticas.')
 
 
 # start
@@ -182,7 +191,7 @@ def get_news(limit=5):
                 media_element = media_section.find('img')
                 if media_element and 'src' in media_element.attrs:
                     media_links.append(media_element['src'])
-                    full_text += f'<img src="{media_element["src"]}">\n\n''src'
+                    full_text += f'<img src="{media_element["src"]}">\n\n'
 
             autor_element = link_content.find(
                 'p', {'class': 'content-publication-data__from'}
@@ -267,7 +276,6 @@ def create_telegraph_post(
             </figure>
             <p>{}</p>
             <a href="{}" target="_blank" rel="noopener noreferrer">Leia a matéria original</a>
-            <p>Algum outro conteúdo aqui.</p>
         '''.format(image_url, description, description, formatted_text, link)
 
         response = telegraph_api.create_page(
@@ -280,8 +288,6 @@ def create_telegraph_post(
     except Exception as e:
         logger.exception(f'Erro ao criar post no Telegraph: {str(e)}')
         return None, None, None
-
-
 
 
 def create_telegraph_posts():
@@ -325,7 +331,7 @@ schedule.every().day.at('23:58').do(total_news)
 
 def delete_news():
     try:
-        logger.info('Deletando todas as noticias do bnaco de dados...')
+        logger.info('Deletando todas as notícias do banco de dados...')
         db.remove_all_news()
     except Exception as e:
         logger.exception(
@@ -335,39 +341,45 @@ def delete_news():
 
 schedule.every().day.at('00:00').do(delete_news)
 
+
+def _wait_minutes(minutes: int):
+    for _ in range(minutes):
+        schedule.run_pending()
+        sleep(60)
+
+
 if __name__ == '__main__':
+    logger.info('Bot iniciado.')
     while True:
         try:
-            logger.info('Iniciando o bot...')
+            logger.info('Buscando notícias...')
             created_links = create_telegraph_posts()
 
+            news_enviadas = 0
             for telegraph_link, title, original_link in created_links:
-                news_name = db.search_title(title)
+                if db.search_title(title) or db.check_history(original_link):
+                    logger.info(f'Notícia já postada, ignorando: {title}')
+                    continue
 
-                if news_name:
-                    logger.info('A notícia já foi postada.')
-                else:
-                    logger.info(
-                        'Adicionando notícia ao banco de dados e enviando mensagem...'
-                    )
-                    current_datetime = datetime.now() - timedelta(hours=3)
-                    date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
-                    db.add_news(title, date)
+                current_datetime = datetime.now() - timedelta(hours=3)
+                date = current_datetime.strftime('%d/%m/%Y - %H:%M:%S')
+                db.add_news(title, date, original_link)
 
-                    logger.info('Enviando notícia...')
-                    bot.send_message(
-                        CHANNEL,
-                        f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
-                        f'🗞 <a href="{original_link}">G1 NEWS</a>',
-                    )
-                    sleep(3600)
+                logger.info(f'Enviando notícia: {title}')
+                bot.send_message(
+                    CHANNEL,
+                    f'<a href="{telegraph_link}">󠀠</a><b>{title}</b>\n\n'
+                    f'🗞 <a href="{original_link}">G1 NEWS</a>',
+                )
+                news_enviadas += 1
+                _wait_minutes(60)
 
-            logger.info('Todas as notícias foram enviadas para o Telegram.')
-            sleep(720)
-            logger.info('Reiniciando a pesquisa após 1h')
-            schedule.run_pending()
-            sleep(60)
-            logger.info('Observando se há schedule')
+            logger.info(
+                f'Ciclo concluído — {news_enviadas} notícia(s) enviada(s). '
+                'Aguardando 12 minutos para próxima busca...'
+            )
+            _wait_minutes(12)
 
         except Exception as e:
             logger.exception(f'Erro não tratado: {str(e)}')
+            sleep(60)

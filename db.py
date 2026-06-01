@@ -1,5 +1,4 @@
-from time import time
-from pymongo import ASCENDING, MongoClient
+from pymongo import MongoClient
 import configparser
 
 config = configparser.ConfigParser()
@@ -74,26 +73,17 @@ def remove_chat_db(chat_id):
     db.chats.delete_one({'chat_id': chat_id})
 
 
-# NOVO
-
-
-def add_news(title, date):
-    last_id = db.news.find().sort('id', -1).limit(1)
-    last_id = list(last_id)
-
-    if len(last_id) == 0:
-        news_id = 1
-    else:
-        last_id = last_id[0]['id']
-        news_id = int(last_id) + 1
-    result = db.news.insert_one(
+def add_news(title, date, link=''):
+    last = list(db.news.find().sort('id', -1).limit(1))
+    news_id = 1 if not last else int(last[0]['id']) + 1
+    return db.news.insert_one(
         {
             'id': news_id,
             'title': title,
             'date': date,
+            'link': link,
         }
     )
-    return result
 
 
 def add_chat_db(chat_id, chat_name):
